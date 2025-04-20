@@ -29,8 +29,10 @@ In traditional OS schedulers, processes are scheduled using fixed algorithms. He
    - Assign each process to either FIFO or RR queue
 
 ### 🗂 Scheduling Phase
-- **FIFO Scheduler**: Executes processes in the order of arrival
-- **Round Robin Scheduler**: Executes with time slicing (quantum = 2)
+
+- **FIFO Scheduler**: Executes processes in the order of arrival .
+- **Round Robin Scheduler**: Executes with time slicing (quantum = 2) .
+- **Shortest Job First** : Executes with  CPU burst time.
 
 ### ⛓ Example Output
 
