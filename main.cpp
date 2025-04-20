@@ -9,8 +9,6 @@
 #include <ctime>   // For time()
 
 int main() {
-    // Training dataset
-
 
     srand(time(NULL)); // Seed for random number generation
     auto start = std::chrono::high_resolution_clock::now();
@@ -24,7 +22,7 @@ int main() {
     }
 
     std::cout << " ✅ Training data loaded successfully.\n";
-    std::cout << " 👉 ____KNN Scheduling Algorithm is Strating____ ..... \n";
+    std::cout << " ➡️ ____KNN Scheduling Algorithm is Strating____ ..... \n";
 
     Knn knn(3);
     knn.fit(training_data);
@@ -33,8 +31,8 @@ int main() {
 
     for (auto& p : testing_data) {
         int predicted_class = knn.predict(p);
-        std::cout << " \n ➡️ The predicted class for the Process " << p.pid << " is: " << predicted_class << std::endl;
-        p.queue_id = predicted_class;
+        std::cout << " \n ➡️ The predicted class for the Process " << p.pid << "is: " << predicted_class << std::endl;
+        p.queue_id = predicted_class; // Assign the predicted class to the Process
         scheduler.add_Process_to_queue(p);
     };
 
@@ -45,4 +43,5 @@ int main() {
     std::cout << "\n 🕑 Execution time: " << duration << " ms" << std::endl;
 
     return 0;
+    
 } 
