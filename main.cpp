@@ -1,71 +1,48 @@
 #include <iostream>
 #include <cmath>
-#include <fstream>
+#include <vector>
+#include <queue>
+#include "Scheduler.h"
+#include "knn_algo.h" 
 #include <chrono>
-#include "common.h"
-#include <omp.h>
-#include <algorithm>
-  
-
-using namespace std;
-using namespace std::chrono;
-
-
-double max_range = 100000;
-int num_point = 500000;
-int num_cluster = 20;
-int max_iterations = 20;
-
-
+#include <cstdlib> // For rand() and srand()
+#include <ctime>   // For time()
 
 int main() {
-    
-    Knn algo(max_range, num_point, num_cluster); ;
-    
-    srand(time(NULL));
-
-    auto start = high_resolution_clock::now();
-
-    printf("Starting KNN with OpenMP\n");
-    printf("Number of points %d\n", num_point);
-    printf("Number of clusters %d\n", num_cluster);
+    // Training dataset
 
 
-    printf("Starting initialization..\n");
+    srand(time(NULL)); // Seed for random number generation
+    auto start = std::chrono::high_resolution_clock::now();
 
-    printf("Creating points..\n");
-    vector<Point> points = algo.init_point(num_point);
-    printf("Points initialized \n");
+    std::vector<Process> training_data = LoadprocessFromCSV("training_data.csv");
+    std::vector<Process> testing_data = LoadprocessFromCSV("testing_data.csv");
 
-    printf("Creating clusters..\n");
-    vector<Cluster> clusters = algo.init_cluster(num_cluster);
-    printf("Clusters initialized \n");
-
-
-    bool conv = true;
-    int iterations = 0;
-
-    printf("Starting iterate..\n");
-
-
-    //The algorithm stops when iterations > max_iteration or when the clusters didn't move
-    while(conv && iterations < max_iterations){
-
-        iterations ++;
-
-        algo.compute_distance(points, clusters);
-
-        conv = algo.update_clusters(clusters);
-
-        printf("Iteration %d done \n", iterations);
-
+    if (training_data.empty() || testing_data.empty()) {
+        std::cerr << " ⛔ No training or testing data found. Exiting..." << std::endl;
+        return 1;
     }
 
-    auto end = high_resolution_clock::now();
-    auto duration = duration_cast<minutes>(end - start); // Calculate duration in milliseconds
+    std::cout << " ✅ Training data loaded successfully.\n";
+    std::cout << " 👉 ____KNN Scheduling Algorithm is Strating____ ..... \n";
 
-    printf("Total execution time: %ld minutes\n", duration.count());
+    Knn knn(3);
+    knn.fit(training_data);
+
+    Scheduler scheduler;
+
+    for (auto& p : testing_data) {
+        int predicted_class = knn.predict(p);
+        std::cout << " \n ➡️ The predicted class for the Process " << p.pid << " is: " << predicted_class << std::endl;
+        p.queue_id = predicted_class;
+        scheduler.add_Process_to_queue(p);
+    };
+
+    scheduler.run();
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    std::cout << "\n 🕑 Execution time: " << duration << " ms" << std::endl;
 
     return 0;
-
-}
+} 
